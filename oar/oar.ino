@@ -161,7 +161,7 @@ void loop()
         i=(5-vx-0.55)/10000;
         rx=(vx/i);
     }
-    if(ax>=448 && ay<448 && az<448)
+    if(ax>=430 && ay<448 && az<448)
     {
     Serial.println("ax>=448 && ay<448 && az<448");
         vx=ax*0.00489;
@@ -169,7 +169,7 @@ void loop()
         rx=(vx/i);
     }
 
-    if(aw>=439 && ax<439 && ay<439 && az<439)
+    if(aw>=430 && ax<439 && ay<439 && az<439)
     {
     Serial.println("aw>=439 && ax<439 && ay<439 && az<439");
         vx=aw*0.00489;
@@ -177,7 +177,7 @@ void loop()
         rx=(vx/i);
     }
 
-    if(av>=439 && aw<439 && ax<439 && ay<439 && az<439)
+    if(av>=430 && aw<439 && ax<439 && ay<439 && az<439)
     {
     Serial.println("av>=439 && aw<439 && ax<439 && ay<439 && az<439");
         vx=av*0.00489;
@@ -235,18 +235,18 @@ void loop()
     Serial.println(" ");
 
 
-    if(vx>4.8)
+    if(az>900)
     {
-        lcd.clear();
+        // lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("----INFINITY----");
+    lcd.setCursor(0,1);
     }
     else
     {
-        lcd.clear();
+        // lcd.clear();
+        lcd.print("                ");
         lcd.setCursor(0,0);
-        lcd.print(i * 1000);
-        lcd.setCursor(5,0);
 
         if(rx<1000)
         {
