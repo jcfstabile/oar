@@ -6,13 +6,13 @@ LiquidCrystal_I2C lcd(0x27,16,2);
 int vin = A0;
 int pulldown = A1;
 
-int t=2;
+int t=5;
 int u=6;
 int v=7;
 int w=8;
 int x=9;
 int y=10;
-int z=13;
+int z=11;
 
 int at;
 int au;
@@ -55,12 +55,6 @@ void setup()
 void loop()
 {
 
-
-/*
-    av=analogRead(pulldown);
-    delay(50);
-    av=analogRead(vin);
-    */
     digitalWrite(t,HIGH);
     digitalWrite(u,LOW);
     digitalWrite(v,LOW);
@@ -231,20 +225,19 @@ void loop()
     Serial.print(i);
     Serial.print(" rx ");
     Serial.print(rx);
+    if(az>900) { Serial.print("INF"); }
 
     Serial.println(" ");
 
 
     if(az>900)
     {
-        // lcd.clear();
         lcd.setCursor(0,0);
         lcd.print("----INFINITY----");
-    lcd.setCursor(0,1);
+        lcd.setCursor(0,1);
     }
     else
     {
-        // lcd.clear();
         lcd.print("                ");
         lcd.setCursor(0,0);
 
@@ -263,6 +256,9 @@ void loop()
         lcd.print((char)244);
     }
     lcd.setCursor(0,1);
-    lcd.print("Arduino Ohmmeter");
+
+    lcd.print("TP ");
+    lcd.print((char)228);
+    lcd.print("Controllers");
 
 }
