@@ -6,7 +6,9 @@ LiquidCrystal_I2C lcd(0x27,16,2);
 int vin = A0;
 int pulldown = A1;
 int buzzer = 12;
+
 bool modoDiodo = LOW;
+bool changed = false;
 int sensorDiodo = 2;
 int enableDiodo = 3;
 
@@ -62,9 +64,25 @@ void setup()
     digitalWrite(z,LOW);
 }
 
+
+void handleMode(){
+    if (digitalRead(sensorDiodo) == HIGH && !changed){
+        modoDiodo = !modoDiodo;
+        changed = true;
+        lcd.setCursor(15,1);
+        lcd.print((char)B11111111);
+
+    }
+    if (digitalRead(sensorDiodo) == LOW && changed){
+        changed = false;
+        lcd.setCursor(15,1);
+        lcd.print((char)B00100000);
+    }
+}
+
 void loop()
 {
-    modoDiodo = digitalRead(sensorDiodo) == HIGH ? !modoDiodo : modoDiodo;
+    handleMode();
 
     digitalWrite(t,HIGH);
     digitalWrite(u,LOW);
@@ -75,6 +93,7 @@ void loop()
     digitalWrite(z,LOW);
     analogRead(pulldown);
     delay(100);
+    handleMode();
     at=analogRead(vin);
 
 
@@ -87,6 +106,7 @@ void loop()
     digitalWrite(z,LOW);
     analogRead(pulldown);
     delay(100);
+    handleMode();
     au=analogRead(vin);
 
 
@@ -99,6 +119,7 @@ void loop()
     digitalWrite(z,LOW);
     analogRead(pulldown);
     delay(100);
+    handleMode();
     av=analogRead(vin);
 
 
@@ -111,6 +132,7 @@ void loop()
     digitalWrite(z,LOW);
     analogRead(pulldown);
     delay(100);
+    handleMode();
     aw=analogRead(vin);
 
 
@@ -123,6 +145,7 @@ void loop()
     digitalWrite(z,LOW);
     analogRead(pulldown);
     delay(100);
+    handleMode();
     ax=analogRead(vin);
 
 
@@ -135,6 +158,7 @@ void loop()
     digitalWrite(z,LOW);
     analogRead(pulldown);
     delay(100);
+    handleMode();
     ay=analogRead(vin);
 
 
@@ -148,6 +172,7 @@ void loop()
     digitalWrite(z,HIGH);
     analogRead(pulldown);
     delay(100);
+    handleMode();
     az=analogRead(vin);
 
 
@@ -252,7 +277,7 @@ void loop()
             lcd.setCursor(14,0);
             lcd.print("mV");
         } else {
-            lcd.print("Abierto");
+            lcd.print("----- OPEN -----");
         }
 
     } else {
