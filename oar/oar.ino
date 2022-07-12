@@ -5,6 +5,10 @@ LiquidCrystal_I2C lcd(0x27,16,2);
 
 int vin = A0;
 int pulldown = A1;
+int buzzer = 12;
+bool modoDiodo = LOW;
+int sensorDiodo = 2;
+int enableDiodo = 3;
 
 int t=5;
 int u=6;
@@ -29,6 +33,12 @@ float i;
 void setup()
 {
     pinMode(vin,INPUT);
+    pinMode(buzzer,OUTPUT);
+
+    pinMode(sensorDiodo, INPUT);
+    pinMode(enableDiodo, OUTPUT);
+
+    digitalWrite(enableDiodo, HIGH);
 
     lcd.init();
     lcd.backlight();
@@ -54,6 +64,7 @@ void setup()
 
 void loop()
 {
+    modoDiodo = digitalRead(sensorDiodo) == HIGH ? !modoDiodo : modoDiodo;
 
     digitalWrite(t,HIGH);
     digitalWrite(u,LOW);
@@ -202,6 +213,10 @@ void loop()
         i=(4.5-vx-0.55)/220;
         rx=(vx/i);
     }
+    if (modoDiodo) {
+        vx=aw*0.00489;
+    }
+
     lcd.setCursor(0,0);
 
     Serial.println("at  au  av  aw  ax  ay  az ");
@@ -225,35 +240,54 @@ void loop()
     Serial.print(i);
     Serial.print(" rx ");
     Serial.print(rx);
-    if(az>900) { Serial.print("INF"); }
+    if(az>900) { Serial.print(" INF"); }
+    Serial.print( modoDiodo ? " Diodo" : " Resitencia" );
 
     Serial.println(" ");
 
-
-    if(az>900)
-    {
+    if (modoDiodo) {
         lcd.setCursor(0,0);
-        lcd.print("----INFINITY----");
-        lcd.setCursor(0,1);
-    }
-    else
-    {
-        lcd.print("                ");
-        lcd.setCursor(0,0);
+        if(vx < 3.0){
+            lcd.print(vx*1000.0);
+            lcd.setCursor(14,0);
+            lcd.print("mV");
+        } else {
+            lcd.print("Abierto");
+        }
 
-        if(rx<1000)
+    } else {
+        if(rx<1.0 && rx>=0.0) {
+            digitalWrite(buzzer, HIGH);
+        } else {
+            digitalWrite(buzzer, LOW);
+        }
+
+        if(az>900)
         {
-            lcd.print(rx);
-            lcd.setCursor(15,0);
-            lcd.print((char)244);
+            lcd.setCursor(0,0);
+            lcd.print("----INFINITY----");
+            lcd.setCursor(0,1);
         }
         else
         {
-            lcd.print(rx/1000,3);
-            lcd.setCursor(14,0);
-            lcd.print("k");
+            lcd.print("                ");
+            lcd.setCursor(0,0);
+
+
+            if(rx<1000)
+            {
+                lcd.print(rx);
+                lcd.setCursor(15,0);
+                lcd.print((char)244);
+            }
+            else
+            {
+                lcd.print(rx/1000,3);
+                lcd.setCursor(14,0);
+                lcd.print("k");
+            }
+            lcd.print((char)244);
         }
-        lcd.print((char)244);
     }
     lcd.setCursor(0,1);
 
