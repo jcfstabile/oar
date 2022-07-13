@@ -1,6 +1,8 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 
+#define DEBUG
+
 LiquidCrystal_I2C lcd(0x27,16,2);
 
 int vin = A0;
@@ -179,21 +181,27 @@ void loop()
 
     if(az>=450)
     {
+#ifdef DEBUG
     Serial.println("az>=450");
+#endif
         vx=az*0.00489;
         i=(5-vx-0.55)/22000;
         rx=(vx/i);
     }
     if(ay>=450 && az<450)
     {
+#ifdef DEBUG
     Serial.println("ay>=450 && az<450");
+#endif
         vx=ay*0.00489;
         i=(5-vx-0.55)/10000;
         rx=(vx/i);
     }
     if(ax>=430 && ay<448 && az<448)
     {
+#ifdef DEBUG
     Serial.println("ax>=448 && ay<448 && az<448");
+#endif
         vx=ax*0.00489;
         i=(5-vx-0.55)/4700;
         rx=(vx/i);
@@ -201,7 +209,9 @@ void loop()
 
     if(aw>=430 && ax<439 && ay<439 && az<439)
     {
+#ifdef DEBUG
     Serial.println("aw>=439 && ax<439 && ay<439 && az<439");
+#endif
         vx=aw*0.00489;
         i=(5-vx-0.55)/2200;
         rx=(vx/i);
@@ -209,7 +219,9 @@ void loop()
 
     if(av>=430 && aw<439 && ax<439 && ay<439 && az<439)
     {
+#ifdef DEBUG
     Serial.println("av>=439 && aw<439 && ax<439 && ay<439 && az<439");
+#endif
         vx=av*0.00489;
         i=(4.8-vx-0.55)/1000;
         rx=(vx/i);
@@ -217,7 +229,9 @@ void loop()
 
     if(au>=430 && av<430 && aw<430 && ax<430 && ay<430 && az<430)
     {
+#ifdef DEBUG
     Serial.println("au>=430 && av<430 && aw<430 && ax<430 && ay<430 && az<430");
+#endif
         vx=au*0.00489;
         i=(4.5-vx-0.55)/560;
         rx=(vx/i);
@@ -225,7 +239,9 @@ void loop()
 
     if(at>=430 && au<430 && av<430 && aw<430 && ax<430 && ay<430 && az<430 )
     {
+#ifdef DEBUG
     Serial.println("at>=430 && au<430 && av<430 && aw<430 && ax<430 && ay<430 && az<430 ");
+#endif
         vx=at*0.00489;
         i=(4.5-vx-0.55)/220;
         rx=(vx/i);
@@ -233,7 +249,9 @@ void loop()
 
     if(at<430 && au<430 && av<430 && aw<430 && ax<430 && ay<430 && az<430 )
     {
+#ifdef DEBUG
     Serial.println("at<430 && au<430 && av<430 && aw<430 && ax<430 && ay<430 && az<430 ");
+#endif
         vx=at*0.00489;
         i=(4.5-vx-0.55)/220;
         rx=(vx/i);
@@ -242,8 +260,8 @@ void loop()
         vx=aw*0.00489;
     }
 
-    lcd.setCursor(0,0);
 
+#ifdef DEBUG
     Serial.println("at  au  av  aw  ax  ay  az ");
     Serial.print(at);
     Serial.print(" ");
@@ -269,53 +287,54 @@ void loop()
     Serial.print( modoDiodo ? " Diodo" : " Resitencia" );
 
     Serial.println(" ");
+#endif
 
+    lcd.setCursor(0,0);
     if (modoDiodo) {
-        lcd.setCursor(0,0);
+
         if(vx < 3.0){
-            lcd.print(vx*1000.0);
+            lcd.print("                ");
+            lcd.setCursor(0,0);
+            lcd.print(vx* (vx<1.0 ? 1000.0: 1.0));
             lcd.setCursor(14,0);
-            lcd.print("mV");
+            lcd.print(vx<1.0 ? "m" : " ");
+            lcd.setCursor(15,0);
+            lcd.print("V");
         } else {
+            // lcd.setCursor(0,0);
             lcd.print("----- OPEN -----");
         }
 
-    } else {
-        if(rx<1.0 && rx>=0.0) {
+        if(vx<0.001 && vx>=0.0) {
             digitalWrite(buzzer, HIGH);
         } else {
             digitalWrite(buzzer, LOW);
         }
 
+    } else {
+
+        digitalWrite(buzzer, LOW);
         if(az>900)
         {
-            lcd.setCursor(0,0);
+            // lcd.setCursor(0,0);
             lcd.print("----INFINITY----");
-            lcd.setCursor(0,1);
         }
         else
         {
             lcd.print("                ");
             lcd.setCursor(0,0);
 
-
-            if(rx<1000)
-            {
-                lcd.print(rx);
+            if (rx>=0){
+                lcd.print(rx / (rx < 1000 ? 1 : 1000));
+                lcd.setCursor(14,0);
+                lcd.print(rx < 1000 ? " ": "k");
                 lcd.setCursor(15,0);
                 lcd.print((char)244);
             }
-            else
-            {
-                lcd.print(rx/1000,3);
-                lcd.setCursor(14,0);
-                lcd.print("k");
-            }
-            lcd.print((char)244);
         }
     }
-    lcd.setCursor(0,1);
 
+    lcd.setCursor(0,1);
     lcd.print("TP ");
     lcd.print((char)228);
     lcd.print("Controllers");
